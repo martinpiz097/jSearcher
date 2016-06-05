@@ -1,0 +1,2 @@
+- Modificar ancho de la columna tamaño
+- Optimizacion del codigo (buscar otra manera de cambiar el TableModel Y TableCellRenderer)
