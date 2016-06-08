@@ -149,7 +149,7 @@ public class WinSearcher extends javax.swing.JFrame {
                         .addComponent(opFile)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(opTexto)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 54, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 52, Short.MAX_VALUE)
                         .addComponent(chkOcultos)
                         .addGap(23, 23, 23))))
         );
@@ -197,16 +197,12 @@ public class WinSearcher extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addComponent(jScrollPane2)
-                        .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGap(15, 15, 15))))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane2)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(15, 15, 15))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -247,16 +243,23 @@ public class WinSearcher extends javax.swing.JFrame {
             String ruta = txtRuta.getText().trim();
             String filtro = txtFiltro.getText().trim();
             
-            Thread hSearcher = new Thread(() -> {
+            if (!filtro.isEmpty()) {
+                Thread hSearcher = new Thread(() -> {
                 try {
                     // panelResultados.removeAll();
                     searcher = new Buscador(ruta, filtro, tblResultados);
                     System.out.println("Entro al try");
-                    
                     txtFiltro.setEnabled(false);
-                    if (opFile.isSelected()) searcher.search(TypeSearch.FILE);
                     
-                    else searcher.search(TypeSearch.FRASE);
+                    TypeSearch include;
+                    if (chkOcultos.isSelected()) include = TypeSearch.INCLUDE_HIDDEN; 
+                    else include = TypeSearch.NO_INCLUDE_HIDDEN;
+
+                    TypeSearch tipoBusqueda;
+                    if (opFile.isSelected()) tipoBusqueda = TypeSearch.FILE;  
+                    else tipoBusqueda = TypeSearch.FRASE;
+                    
+                    searcher.search(tipoBusqueda, include);
                     
                     if (searcher.isTerminado()) {
                         
@@ -277,13 +280,14 @@ public class WinSearcher extends javax.swing.JFrame {
                                 JOptionPane.INFORMATION_MESSAGE);
                         
                     }
-                } catch (FileNotFoundException ex) {
-                    Logger.getLogger(WinSearcher.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InterruptedException ex) {
+                } catch (FileNotFoundException | InterruptedException ex) {
                     Logger.getLogger(WinSearcher.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            });
-            hSearcher.start();
+                });
+                hSearcher.start();
+            }
+            
+            else JOptionPane.showMessageDialog(this, "Debe ingresar algun filtro");
             
             
 //            DialogoEspera dialog = null;

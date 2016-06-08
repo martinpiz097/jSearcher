@@ -60,25 +60,25 @@ public class Buscador {
         listaResultados = new LinkedList<>();
     }
     
-    public void search(TypeSearch typeSearch) throws FileNotFoundException, InterruptedException{
+    public void search(TypeSearch typeSearch, TypeSearch include) throws FileNotFoundException, InterruptedException{
         
-        if (typeSearch == TypeSearch.FILE) searchFile();
+        if (typeSearch == TypeSearch.FILE) searchFile(include);
             
-        else searchText();
+        else searchText(include);
     }
     
-    public void searchText() throws FileNotFoundException, InterruptedException{
+    public void searchText(TypeSearch include) throws FileNotFoundException, InterruptedException{
         
         terminado = false;
         reiniarContador();
-        startSearchPhrase(directory);
+        startSearchPhrase(directory, include);
         terminado = !terminado;
     }
     
-    public void searchFile() throws InterruptedException{
+    public void searchFile(TypeSearch include) throws InterruptedException{
         terminado = false;
         reiniarContador();
-        startSearchFiles(directory);
+        startSearchFiles(directory, include);
         terminado = !terminado;
     }
     
@@ -218,15 +218,7 @@ public class Buscador {
         return terminado;
     }
     
-    public void buscar(TypeSearch type, File directory) throws FileNotFoundException, InterruptedException{
-        
-        if (type == TypeSearch.FRASE) startSearchPhrase(directory);
-        
-
-        else startSearchFiles(directory);
-    }
-    
-    public void startSearchPhrase(File directory) throws FileNotFoundException, InterruptedException{
+    public void startSearchPhrase(File directory, TypeSearch include) throws FileNotFoundException, InterruptedException{
         
         BufferedReader br;
         boolean rutaImpresa = false;
@@ -236,29 +228,52 @@ public class Buscador {
 
             for (File file : files) {
 
-                if (file.isDirectory()) startSearchPhrase(file);
+                if (include == TypeSearch.INCLUDE_HIDDEN) {
+                    
+                    if (file.isDirectory()) startSearchPhrase(file, include);
                 
-                else {
+                    else {
 
-                    br = new BufferedReader(new FileReader(file));
+                        br = new BufferedReader(new FileReader(file));
 
-                    String line;
+                        String line;
 
-                    for (Iterator<String> it = br.lines().iterator(); it.hasNext();) {
-                        line = it.next();
-                        if (line.contains(busqueda) && !rutaImpresa) {
-                            aumentarContador();
-                            addResultado(file);
-                            break;
+                        for (Iterator<String> it = br.lines().iterator(); it.hasNext();) {
+                            line = it.next();
+                            if (line.contains(busqueda) && !rutaImpresa) {
+                                aumentarContador();
+                                addResultado(file);
+                                break;
+                            }
+                        }
+
+                    }
+                }
+                
+                else if (!file.isHidden()) {
+                    
+                    if (file.isDirectory()) startSearchPhrase(file, include);
+                
+                    else {
+
+                        br = new BufferedReader(new FileReader(file));
+                        String line;
+
+                        for (Iterator<String> it = br.lines().iterator(); it.hasNext();) {
+                            line = it.next();
+                            if (line.contains(busqueda) && !rutaImpresa) {
+                                aumentarContador();
+                                addResultado(file);
+                                break;
+                            }
                         }
                     }
-
                 }
             }
         }
     }
     
-    public void startSearchFiles(File directory) throws InterruptedException{
+    public void startSearchFiles(File directory, TypeSearch include) throws InterruptedException{
 
         files = directory.listFiles();
 
@@ -272,7 +287,7 @@ public class Buscador {
                 }
 
                 if (file.isDirectory()) {
-                    startSearchFiles(file);
+                    startSearchFiles(file, include);
                 }
 
             }

@@ -11,6 +11,6 @@ package org.martin.buscadorFrases.data;
  */
 public enum TypeSearch {
 
-    FRASE, FILE;
+    FRASE, FILE, INCLUDE_HIDDEN, NO_INCLUDE_HIDDEN;
     
 }
