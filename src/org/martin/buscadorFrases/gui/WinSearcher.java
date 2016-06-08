@@ -30,7 +30,7 @@ public class WinSearcher extends javax.swing.JFrame {
     
     public WinSearcher() {
         initComponents();
-        setTitle("jSearcher V0.4a");
+        setTitle("jSearcher V0.6a");
         opFile.setSelected(true);
         txtFiltro.setEditable(false);
         fileChoos = new JFileChooser();
