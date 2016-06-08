@@ -5,14 +5,9 @@
  */
 package org.martin.buscadorFrases.gui;
 
-import com.sun.javafx.iio.ImageStorage;
-import com.sun.javafx.iio.ImageStorage.ImageType;
 import org.martin.buscadorFrases.data.Buscador;
 import java.awt.Color;
-import java.awt.GraphicsEnvironment;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
-import java.awt.print.PrinterException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.logging.Level;
@@ -20,7 +15,7 @@ import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.table.TableColumn;
+import org.martin.buscadorFrases.data.TypeSearch;
 
 /**
  *
@@ -29,6 +24,7 @@ import javax.swing.table.TableColumn;
 public class WinSearcher extends javax.swing.JFrame {
 
     public static final String STR_RUTA_NO_ESPECIFICADA = "[No se ha ingresado ninguna ruta]";
+    public static final String USER_NAME = System.getProperty("user.name");
     JFileChooser fileChoos;
     Buscador searcher;
     
@@ -45,6 +41,7 @@ public class WinSearcher extends javax.swing.JFrame {
             @Override
             public boolean accept(File f) {
 
+                
                 return f.isDirectory();
             }
 
@@ -109,6 +106,7 @@ public class WinSearcher extends javax.swing.JFrame {
 
         btnExplorar.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         btnExplorar.setText("...");
+        btnExplorar.setToolTipText("");
         btnExplorar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnExplorarActionPerformed(evt);
@@ -126,7 +124,6 @@ public class WinSearcher extends javax.swing.JFrame {
 
         chkOcultos.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         chkOcultos.setText("Incluir ocultos");
-        chkOcultos.setEnabled(false);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -257,9 +254,9 @@ public class WinSearcher extends javax.swing.JFrame {
                     System.out.println("Entro al try");
                     
                     txtFiltro.setEnabled(false);
-                    if (opFile.isSelected()) searcher.searchFile();
+                    if (opFile.isSelected()) searcher.search(TypeSearch.FILE);
                     
-                    else searcher.searchText();
+                    else searcher.search(TypeSearch.FRASE);
                     
                     if (searcher.isTerminado()) {
                         
@@ -281,6 +278,8 @@ public class WinSearcher extends javax.swing.JFrame {
                         
                     }
                 } catch (FileNotFoundException ex) {
+                    Logger.getLogger(WinSearcher.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InterruptedException ex) {
                     Logger.getLogger(WinSearcher.class.getName()).log(Level.SEVERE, null, ex);
                 }
             });

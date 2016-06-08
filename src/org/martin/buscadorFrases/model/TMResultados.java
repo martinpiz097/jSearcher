@@ -6,12 +6,10 @@
 package org.martin.buscadorFrases.model;
 
 import java.io.File;
+import java.math.MathContext;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
-import javax.swing.ImageIcon;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 import javax.swing.JLabel;
@@ -23,6 +21,7 @@ public class TMResultados implements TableModel{
     
     private final LinkedList<File> archivos;
     private static final NumberFormat nf = new DecimalFormat("#0.0");
+    private static final short BYTE_IN_KILOBYTE = 1024;
     
     public TMResultados(LinkedList<File> archivos) {
         System.out.println("Model built");
@@ -38,8 +37,16 @@ public class TMResultados implements TableModel{
     }
     
     public File getFile(int index){
-        // archivos.element() --> retorna el primer elemento de la lista
+        // archivos.element() --> retorna el primer elemento de la lista (solo en linkedList)
         return archivos.get(index);
+    }
+
+    private long raise(int number, int numberOfTimes){
+        
+        for (int i = 1; i < numberOfTimes; i++) 
+            number *= number;
+
+        return number;
     }
     
     @Override
@@ -64,7 +71,11 @@ public class TMResultados implements TableModel{
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
-        return Object.class;
+        
+        if (columnIndex == 0) return Object.class;
+        
+        else return String.class;
+        
     }
 
     @Override
@@ -79,10 +90,18 @@ public class TMResultados implements TableModel{
         File f = archivos.get(rowIndex);
         JLabel lbl;
         String rutaIcon;
-        
+        long tamaño = f.length();
+
         switch(columnIndex){
             
-            case 1: return nf.format((double)f.length() / 1000) + "kB";
+            case 1: 
+                if (tamaño < raise(BYTE_IN_KILOBYTE, 2)) 
+                    return nf.format((double)f.length() / 1000) + "kB";
+                
+                else if (tamaño < raise(BYTE_IN_KILOBYTE, 3)) 
+                    return nf.format((double)f.length() / raise(BYTE_IN_KILOBYTE, 2)) + "MB";
+                
+                else return nf.format((double)f.length() / raise(BYTE_IN_KILOBYTE, 3)) + "GB";
                 
             default: return f.getAbsolutePath();
         }

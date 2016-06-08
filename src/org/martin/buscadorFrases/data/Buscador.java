@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,6 +38,7 @@ public class Buscador {
     private TMResultados model;
     private JTable table;
     private LinkedList<File> listaResultados;
+    private static File[] files;
     
     public Buscador(String ruta, String busqueda, JPanel areaResultados) throws FileNotFoundException {
 
@@ -58,18 +60,25 @@ public class Buscador {
         listaResultados = new LinkedList<>();
     }
     
-    public void searchText() throws FileNotFoundException{
+    public void search(TypeSearch typeSearch) throws FileNotFoundException, InterruptedException{
+        
+        if (typeSearch == TypeSearch.FILE) searchFile();
+            
+        else searchText();
+    }
+    
+    public void searchText() throws FileNotFoundException, InterruptedException{
         
         terminado = false;
         reiniarContador();
-        buscarFrase(directory);
+        startSearchPhrase(directory);
         terminado = !terminado;
     }
     
-    public void searchFile(){
+    public void searchFile() throws InterruptedException{
         terminado = false;
         reiniarContador();
-        searchFiles(directory);
+        startSearchFiles(directory);
         terminado = !terminado;
     }
     
@@ -168,8 +177,8 @@ public class Buscador {
         }
         
         listaResultados.add(file);
-        System.out.println("Cantidad de resultados actual: " + listaResultados.size());
         table.setModel(new TMResultados(listaResultados));
+        System.out.println("Cantidad de resultados actual: " + listaResultados.size());
         table.setDefaultRenderer(Object.class, new TCRResultados(listaResultados));
     }
     
@@ -177,20 +186,12 @@ public class Buscador {
         
         String filePath = f.getAbsolutePath();
         String path = "";
-        int cantSlash = 0;
-        int cantSlash2 = 0;
-        
-        for (int i = 0; i < filePath.length(); i++)
-            if (filePath.charAt(i) == '/') cantSlash++; 
+        String[] directories = filePath.split("/");
+        int cantSlash = directories.length-1;
 
-        for (int i = 0; i < filePath.length(); i++) {
-            if (filePath.charAt(i) == '/') cantSlash2++; 
-            
-            path += filePath.charAt(i);
-            
-            if(cantSlash2 == cantSlash) break;
-            
-        }
+        for (int i = 0; i < directories.length; i++) 
+            if (i < directories.length-1) path += directories[i];
+        
         System.out.println(cantSlash);
         System.out.println(filePath);
         System.out.println(path);
@@ -217,54 +218,72 @@ public class Buscador {
         return terminado;
     }
     
-    public void buscar(TypeSearch type, File directory) throws FileNotFoundException{
+    public void buscar(TypeSearch type, File directory) throws FileNotFoundException, InterruptedException{
         
-        if (type == TypeSearch.FRASE) buscarFrase(directory);
+        if (type == TypeSearch.FRASE) startSearchPhrase(directory);
         
-        else searchFiles(directory);
+
+        else startSearchFiles(directory);
     }
     
-    public void buscarFrase(File directory) throws FileNotFoundException{
+    public void startSearchPhrase(File directory) throws FileNotFoundException, InterruptedException{
         
         BufferedReader br;
         boolean rutaImpresa = false;
-        for (File file : directory.listFiles()) {
-            
-            if (file.isDirectory()) buscarFrase(file);
-            
-            else{
+        files = directory.listFiles();
+        
+        if (files != null) {
+
+            for (File file : files) {
+
+                if (file.isDirectory()) startSearchPhrase(file);
                 
-                br = new BufferedReader(new FileReader(file));
-                
-                br.lines().forEach((line) -> {
-                    
-                    if (line.contains(busqueda) && !rutaImpresa) {
-                        aumentarContador();
-                        addResultado(file);
-                        toTrue(rutaImpresa);
-                        System.out.println(rutaImpresa);
+                else {
+
+                    br = new BufferedReader(new FileReader(file));
+
+                    String line;
+
+                    for (Iterator<String> it = br.lines().iterator(); it.hasNext();) {
+                        line = it.next();
+                        if (line.contains(busqueda) && !rutaImpresa) {
+                            aumentarContador();
+                            addResultado(file);
+                            break;
+                        }
                     }
-                });
+
+                }
             }
         }
     }
     
-    public void searchFiles(File directory){
+    public void startSearchFiles(File directory) throws InterruptedException{
 
-        for (File file : directory.listFiles()) {
-            
-            if (file.getName().contains(busqueda)) {
-                addResultado(file);
-                aumentarContador();
-            }    
-            
-            if (file.isDirectory()) searchFiles(file);
+        files = directory.listFiles();
 
-        }        
+        if (files != null) {
+
+            for (File file : files) {
+
+                if (file.getName().contains(busqueda)) {
+                    addResultado(file);
+                    aumentarContador();
+                }
+
+                if (file.isDirectory()) {
+                    startSearchFiles(file);
+                }
+
+            }
+
+        }
     }
     
     private void toTrue(boolean param){
-        param = true;
+        
+        if (!param) param = !param; 
+        
     }
     
     private void aumentarContador(){
