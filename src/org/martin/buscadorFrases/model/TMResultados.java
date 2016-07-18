@@ -6,7 +6,6 @@
 package org.martin.buscadorFrases.model;
 
 import java.io.File;
-import java.math.MathContext;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -103,24 +102,20 @@ public class TMResultados implements TableModel{
                 
                 else return nf.format((double)f.length() / raise(BYTE_IN_KILOBYTE, 3)) + "GB";
                 
-            default: return f.getAbsolutePath();
+            default: return f.getParent();
         }
     }
 
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-
     }
 
     @Override
     public void addTableModelListener(TableModelListener l) {
-
     }
 
     @Override
     public void removeTableModelListener(TableModelListener l) {
-
     }
-
     
 }

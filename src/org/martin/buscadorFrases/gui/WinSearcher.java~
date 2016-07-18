@@ -7,20 +7,15 @@ package org.martin.buscadorFrases.gui;
 
 import org.martin.buscadorFrases.data.Buscador;
 import java.awt.Color;
-import java.awt.Desktop;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import org.martin.buscadorFrases.data.TypeSearch;
-import org.martin.buscadorFrases.model.TMResultados;
 
 /**
  *
@@ -32,7 +27,6 @@ public class WinSearcher extends javax.swing.JFrame {
     public static final String USER_NAME = System.getProperty("user.name");
     JFileChooser fileChoos;
     Buscador searcher;
-    Thread hSearcher;
     
     public WinSearcher() {
         initComponents();
@@ -51,12 +45,11 @@ public class WinSearcher extends javax.swing.JFrame {
 
             @Override
             public String getDescription() {
+                
                 return "Solo directorios";
             }
         });
         setLocationRelativeTo(null);
-        dialogSearchLoader.setSize(dialogSearchLoader.getPreferredSize());
-        dialogSearchLoader.setResizable(false);
     }
 
     @SuppressWarnings("unchecked")
@@ -64,8 +57,6 @@ public class WinSearcher extends javax.swing.JFrame {
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
-        dialogSearchLoader = new javax.swing.JDialog();
-        lblSearching = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         opFile = new javax.swing.JRadioButton();
@@ -76,29 +67,10 @@ public class WinSearcher extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         txtFiltro = new javax.swing.JTextField();
         chkOcultos = new javax.swing.JCheckBox();
+        jScrollPane2 = new javax.swing.JScrollPane();
         panelResultados = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblResultados = new javax.swing.JTable();
-
-        dialogSearchLoader.setPreferredSize(new java.awt.Dimension(128, 183));
-        dialogSearchLoader.addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowOpened(java.awt.event.WindowEvent evt) {
-                dialogSearchLoaderWindowOpened(evt);
-            }
-            public void windowClosing(java.awt.event.WindowEvent evt) {
-                dialogSearchLoaderWindowClosing(evt);
-            }
-        });
-
-        lblSearching.setBackground(java.awt.Color.white);
-        lblSearching.setFont(new java.awt.Font("Comic Sans MS", 0, 18)); // NOI18N
-        lblSearching.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblSearching.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/martin/buscadorFrases/resources/loader.gif"))); // NOI18N
-        lblSearching.setText("Buscando...");
-        lblSearching.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        lblSearching.setOpaque(true);
-        lblSearching.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        dialogSearchLoader.getContentPane().add(lblSearching, java.awt.BorderLayout.CENTER);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -121,11 +93,6 @@ public class WinSearcher extends javax.swing.JFrame {
 
         jLabel2.setText("¿Donde?");
 
-        txtRuta.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                txtRutaFocusGained(evt);
-            }
-        });
         txtRuta.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 txtRutaKeyPressed(evt);
@@ -137,7 +104,7 @@ public class WinSearcher extends javax.swing.JFrame {
 
         btnExplorar.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         btnExplorar.setText("...");
-        btnExplorar.setToolTipText("Explorar");
+        btnExplorar.setToolTipText("");
         btnExplorar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnExplorarActionPerformed(evt);
@@ -180,9 +147,9 @@ public class WinSearcher extends javax.swing.JFrame {
                         .addComponent(opFile)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(opTexto)
-                        .addGap(32, 32, 32)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 52, Short.MAX_VALUE)
                         .addComponent(chkOcultos)
-                        .addContainerGap(23, Short.MAX_VALUE))))
+                        .addGap(23, 23, 23))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -205,41 +172,42 @@ public class WinSearcher extends javax.swing.JFrame {
         );
 
         panelResultados.setBorder(javax.swing.BorderFactory.createTitledBorder("Resultados"));
-        panelResultados.setLayout(new java.awt.BorderLayout());
+        panelResultados.setLayout(new java.awt.GridLayout(0, 1));
 
-        jScrollPane1.setBorder(null);
-
-        tblResultados.setModel(new TMResultados(new LinkedList<File>()));
-        tblResultados.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                tblResultadosMouseReleased(evt);
+        tblResultados.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
             }
-        });
-        tblResultados.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                tblResultadosKeyPressed(evt);
-            }
-        });
+        ));
         jScrollPane1.setViewportView(tblResultados);
 
-        panelResultados.add(jScrollPane1, java.awt.BorderLayout.CENTER);
+        panelResultados.add(jScrollPane1);
+
+        jScrollPane2.setViewportView(panelResultados);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panelResultados, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane2)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(15, 15, 15))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(panelResultados, javax.swing.GroupLayout.DEFAULT_SIZE, 501, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -274,10 +242,11 @@ public class WinSearcher extends javax.swing.JFrame {
             String filtro = txtFiltro.getText().trim();
             
             if (!filtro.isEmpty()) {
-                hSearcher = new Thread(() -> {
+                Thread hSearcher = new Thread(() -> {
                 try {
                     // panelResultados.removeAll();
                     searcher = new Buscador(ruta, filtro, tblResultados);
+                    System.out.println("Entro al try");
                     txtFiltro.setEnabled(false);
                     
                     TypeSearch include;
@@ -288,18 +257,16 @@ public class WinSearcher extends javax.swing.JFrame {
                     if (opFile.isSelected()) tipoBusqueda = TypeSearch.FILE;  
                     else tipoBusqueda = TypeSearch.FRASE;
                     
-                    openDialog();
                     searcher.search(tipoBusqueda, include);
                     
                     if (searcher.isTerminado()) {
                         
-                        dialogSearchLoader.hide();
                         txtFiltro.setEnabled(true);
                         if (searcher.getContadorResultados() > 0) {
                         
                             JOptionPane.showMessageDialog(
                                 this,
-                                "Busqueda Finalizada\nCantidad de resultados: " + searcher.getContadorResultados(),
+                                "Busqueda Finalizada",
                                 "Mensaje",
                                 JOptionPane.INFORMATION_MESSAGE);
                         }
@@ -355,61 +322,6 @@ public class WinSearcher extends javax.swing.JFrame {
         
     }//GEN-LAST:event_txtRutaKeyReleased
 
-    private void tblResultadosMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblResultadosMouseReleased
-
-        try {
-            if (evt.getClickCount() == 2) openResult();
-        } catch (IOException ex) {
-            Logger.getLogger(Buscador.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }//GEN-LAST:event_tblResultadosMouseReleased
-
-    private void dialogSearchLoaderWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_dialogSearchLoaderWindowOpened
-         ((ImageIcon) lblSearching.getIcon()).setImageObserver(lblSearching);
-    }//GEN-LAST:event_dialogSearchLoaderWindowOpened
-
-    private void dialogSearchLoaderWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_dialogSearchLoaderWindowClosing
-        hSearcher.stop();
-        searcher.showResults();
-        txtFiltro.setEnabled(true);
-        txtFiltro.selectAll();
-        txtFiltro.requestFocus();
-    }//GEN-LAST:event_dialogSearchLoaderWindowClosing
-
-    private void tblResultadosKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tblResultadosKeyPressed
-
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) 
-            try {
-                openResult();
-        } catch (IOException ex) {
-            Logger.getLogger(WinSearcher.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-    }//GEN-LAST:event_tblResultadosKeyPressed
-
-    private void txtRutaFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtRutaFocusGained
-
-        if (txtRuta.getBackground() == Color.RED) {
-            txtRuta.setText(null);
-            txtRuta.setBackground(Color.WHITE);
-        }
-    }//GEN-LAST:event_txtRutaFocusGained
-
-    private void openDialog(){
-        dialogSearchLoader.setLocationRelativeTo(this);
-        dialogSearchLoader.show();
-    }
-    
-    private void openResult() throws IOException{
-        TMResultados tm = (TMResultados) tblResultados.getModel();
-        File selected = tm.getFile(tblResultados.getSelectedRow());
-        
-        if (selected.isDirectory())
-            Desktop.getDesktop().open(selected);
-        else
-            Desktop.getDesktop().open(selected.getParentFile());
-    }
-    
     /**
      * @param args the command line arguments
      */
@@ -438,8 +350,10 @@ public class WinSearcher extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> {
-            new WinSearcher().setVisible(true);
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new WinSearcher().setVisible(true);
+            }
         });
     }
 
@@ -447,13 +361,12 @@ public class WinSearcher extends javax.swing.JFrame {
     private javax.swing.JButton btnExplorar;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JCheckBox chkOcultos;
-    private javax.swing.JDialog dialogSearchLoader;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JLabel lblSearching;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JRadioButton opFile;
     private javax.swing.JRadioButton opTexto;
     private javax.swing.JPanel panelResultados;

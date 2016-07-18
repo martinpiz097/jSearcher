@@ -43,7 +43,6 @@ public class Buscador {
     public Buscador(String ruta, String busqueda, JPanel areaResultados) throws FileNotFoundException {
 
         directory = new File(ruta);
-        System.out.println(directory.getName());
         this.busqueda = busqueda;
         contadorResultados = 0;
         this.areaResultados = areaResultados;
@@ -63,8 +62,8 @@ public class Buscador {
     public void search(TypeSearch typeSearch, TypeSearch include) throws FileNotFoundException, InterruptedException{
         
         if (typeSearch == TypeSearch.FILE) searchFile(include);
-            
         else searchText(include);
+        showResults();
     }
     
     public void searchText(TypeSearch include) throws FileNotFoundException, InterruptedException{
@@ -132,53 +131,9 @@ public class Buscador {
 //    
     // Retorna el directorio al cual el archivo pertenece
     
-    private void addResultado(File file){
-
-        if (listaResultados.isEmpty()) {
-            table.setRowHeight(32);
-            table.addMouseListener(new MouseListener() {
-
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                }
-
-                @Override
-                public void mousePressed(MouseEvent e) {
-                }
-
-                @Override
-                public void mouseReleased(MouseEvent e) {
-
-                    try {
-                        TMResultados tm = (TMResultados) table.getModel();
-                        File selected = tm.getFile(table.getSelectedRow());
-
-                        if (selected.isDirectory()) {
-                            Desktop.getDesktop().open(selected);
-                        } else {
-                            Desktop.getDesktop().open(getDirectory(selected));
-                        }
-
-                    } catch (IOException ex) {
-                        Logger.getLogger(Buscador.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-
-                }
-
-                @Override
-                public void mouseEntered(MouseEvent e) {
-                }
-
-                @Override
-                public void mouseExited(MouseEvent e) {
-                }
-            });
-
-        }
-        
-        listaResultados.add(file);
+    public void showResults(){
+        table.setRowHeight(30);
         table.setModel(new TMResultados(listaResultados));
-        System.out.println("Cantidad de resultados actual: " + listaResultados.size());
         table.setDefaultRenderer(Object.class, new TCRResultados(listaResultados));
     }
     
@@ -237,12 +192,13 @@ public class Buscador {
                         br = new BufferedReader(new FileReader(file));
 
                         String line;
-
-                        for (Iterator<String> it = br.lines().iterator(); it.hasNext();) {
+                        Iterator<String> it;
+                        
+                        for (it = br.lines().iterator(); it.hasNext();) {
                             line = it.next();
                             if (line.contains(busqueda) && !rutaImpresa) {
                                 aumentarContador();
-                                addResultado(file);
+                                listaResultados.add(file);
                                 break;
                             }
                         }
@@ -258,12 +214,13 @@ public class Buscador {
 
                         br = new BufferedReader(new FileReader(file));
                         String line;
-
-                        for (Iterator<String> it = br.lines().iterator(); it.hasNext();) {
+                        Iterator<String> it;
+                        
+                        for (it = br.lines().iterator(); it.hasNext();) {
                             line = it.next();
                             if (line.contains(busqueda) && !rutaImpresa) {
                                 aumentarContador();
-                                addResultado(file);
+                                listaResultados.add(file);
                                 break;
                             }
                         }
@@ -281,14 +238,25 @@ public class Buscador {
 
             for (File file : files) {
 
-                if (file.getName().contains(busqueda)) {
-                    addResultado(file);
-                    aumentarContador();
+                if (include == TypeSearch.INCLUDE_HIDDEN) {
+                    if (file.getName().contains(busqueda)) {
+                        listaResultados.add(file);
+                        aumentarContador();
+                    }
+                    if (file.isDirectory()) 
+                        startSearchFiles(file, include);
+                }
+                
+                else if(!file.isHidden()){
+                    if (file.getName().contains(busqueda)) {
+                        listaResultados.add(file);
+                        aumentarContador();
+                    }
+                    if (file.isDirectory()) 
+                        startSearchFiles(file, include);
                 }
 
-                if (file.isDirectory()) {
-                    startSearchFiles(file, include);
-                }
+                
 
             }
 

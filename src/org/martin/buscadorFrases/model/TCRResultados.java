@@ -5,6 +5,7 @@
  */
 package org.martin.buscadorFrases.model;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.io.File;
 import java.util.LinkedList;
@@ -27,22 +28,29 @@ public class TCRResultados implements TableCellRenderer {
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-
-        
-        File f = archivos.get(row);
         JLabel lbl = new JLabel();
+        ImageIcon icon;
+        File file = archivos.get(row);
         
         if (column == 0) {
-            String rutaIcon;
-            lbl.setText(f.getName());
-            if (f.isDirectory()) rutaIcon = "/org/martin/buscadorFrases/resources/folder.png";
-        
-            else rutaIcon = "/org/martin/buscadorFrases/resources/file.png";
+            if (file.isDirectory()) 
+                icon = new ImageIcon(getClass().getResource("/org/martin/buscadorFrases/resources/folder.png"));
 
-            lbl.setIcon(new ImageIcon(getClass().getResource(rutaIcon)));
-        }
+            else
+                icon = new ImageIcon(getClass().getResource("/org/martin/buscadorFrases/resources/file.png"));
         
-        else lbl = new JLabel(value.toString());
+            lbl.setIcon(icon);
+            lbl.setText(file.getName());
+        }
+    
+        else lbl.setText(value.toString());
+
+        Color bg = lbl.getBackground();
+        
+        if (isSelected) lbl.setBackground(Color.CYAN);
+            
+        else lbl.setBackground(bg);
+        lbl.setOpaque(true);
         return lbl;
     }
 
